@@ -102,6 +102,8 @@ private:
 
     json_spirit::mObject const& m_testInputObject;
 	json_spirit::mObject& m_testOutputObject;
+
+    Logger m_logger{createLogger(VerbosityInfo, "state")};
 };
 
 template<class T>

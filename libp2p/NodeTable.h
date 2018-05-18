@@ -40,7 +40,7 @@ namespace p2p
 struct NodeEntry: public Node
 {
     NodeEntry(NodeID const& _src, Public const& _pubk, NodeIPEndpoint const& _gw);
-    unsigned const distance;	///< Node's distance (xor of _src as integer).
+    int const distance;	///< Node's distance (xor of _src as integer).
     bool pending = true;		///< Node will be ignored until Pong is received
 };
 
@@ -146,7 +146,7 @@ public:
     ~NodeTable();
 
     /// Returns distance based on xor metric two node ids. Used by NodeEntry and NodeTable.
-    static unsigned distance(NodeID const& _a, NodeID const& _b) { u256 d = sha3(_a) ^ sha3(_b); unsigned ret; for (ret = 0; d >>= 1; ++ret) {}; return ret; }
+    static int distance(NodeID const& _a, NodeID const& _b) { u256 d = sha3(_a) ^ sha3(_b); unsigned ret; for (ret = 0; d >>= 1; ++ret) {}; return ret; }
 
     /// Set event handler for NodeEntryAdded and NodeEntryDropped events.
     void setEventHandler(NodeTableEventHandler* _handler) { m_nodeEventHandler.reset(_handler); }
@@ -274,6 +274,8 @@ private:
 
     std::shared_ptr<NodeSocket> m_socket;							///< Shared pointer for our UDPSocket; ASIO requires shared_ptr.
     NodeSocket* m_socketPointer;									///< Set to m_socket.get(). Socket is created in constructor and disconnected in destructor to ensure access to pointer is safe.
+
+    Logger m_logger{createLogger(VerbosityDebug, "discov")};
 
     DeadlineOps m_timers; ///< this should be the last member - it must be destroyed first
 };
@@ -455,20 +457,6 @@ struct Neighbours: DiscoveryDatagram
         ts = r[1].toInt<uint32_t>();
     }
 };
-
-struct NodeTableWarn: public LogChannel { static const char* name(); static const int verbosity = 0; };
-struct NodeTableNote: public LogChannel { static const char* name(); static const int verbosity = 1; };
-struct NodeTableMessageSummary: public LogChannel { static const char* name(); static const int verbosity = 2; };
-struct NodeTableMessageDetail: public LogChannel { static const char* name(); static const int verbosity = 5; };
-struct NodeTableConnect: public LogChannel { static const char* name(); static const int verbosity = 10; };
-struct NodeTableEvent: public LogChannel { static const char* name(); static const int verbosity = 10; };
-struct NodeTableTimer: public LogChannel { static const char* name(); static const int verbosity = 10; };
-struct NodeTableUpdate: public LogChannel { static const char* name(); static const int verbosity = 10; };
-struct NodeTableTriviaSummary: public LogChannel { static const char* name(); static const int verbosity = 10; };
-struct NodeTableTriviaDetail: public LogChannel { static const char* name(); static const int verbosity = 11; };
-struct NodeTableAllDetail: public LogChannel { static const char* name(); static const int verbosity = 13; };
-struct NodeTableEgress: public LogChannel { static const char* name(); static const int verbosity = 14; };
-struct NodeTableIngress: public LogChannel { static const char* name(); static const int verbosity = 15; };
 
 }
 }

@@ -14,22 +14,19 @@
     You should have received a copy of the GNU General Public License
     along with cpp-ethereum.  If not, see <http://www.gnu.org/licenses/>.
 */
-/** @file Common.cpp
- * @author Gav Wood <i@gavwood.com>
- * @date 2014
- */
 
 #include "Common.h"
 #include "Exceptions.h"
 #include "Log.h"
-#include "BuildInfo.h"
+
+#include <eth-buildinfo.h>
 
 using namespace std;
 
 namespace dev
 {
 
-char const* Version = ETH_PROJECT_VERSION;
+char const* Version = eth_get_buildinfo()->project_version;
 bytes const NullBytes;
 std::string const EmptyString;
 
@@ -42,19 +39,12 @@ void InvariantChecker::checkInvariants(HasInvariants const* _this, char const* _
     }
 }
 
-struct TimerChannel: public LogChannel { static const char* name(); static const int verbosity = 0; };
-
-#if defined(_WIN32)
-const char* TimerChannel::name() { return EthRed " ! "; }
-#else
-const char* TimerChannel::name() { return EthRed " ⚡ "; }
-#endif
-
 TimerHelper::~TimerHelper()
 {
     auto e = std::chrono::high_resolution_clock::now() - m_t;
     if (!m_ms || e > chrono::milliseconds(m_ms))
-        clog(TimerChannel) << m_id << chrono::duration_cast<chrono::milliseconds>(e).count() << "ms";
+        clog(VerbosityDebug, "timer")
+            << m_id << " " << chrono::duration_cast<chrono::milliseconds>(e).count() << " ms";
 }
 
 int64_t utcTime()
