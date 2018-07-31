@@ -1,3 +1,5 @@
+#loligo is an Ethereum Fork
+
 # cpp-ethereum - Ethereum C++ client
 
 This repository contains [cpp-ethereum](http://cpp-ethereum.org), the [Ethereum](https://ethereum.org) C++ client.
